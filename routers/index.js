@@ -1,9 +1,7 @@
-const express = require('express')
-const userController = require('../controllers/userController')
+const express = require('express');
+const routerClient = require('./routerClient')
 const router = express.Router();
 
-module.exports = function () {
-    router.post('/user-add', userController.nuevouser )
-    return router;
-}
+router.use('/client', routerClient);
+module.exports = router;
 

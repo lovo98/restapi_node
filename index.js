@@ -1,16 +1,15 @@
 const express = require('express');
 const routers = require('./routers')
 const sequelize = require('./db/index');
-const Usuario = require('./models/User');
-const bodyParse = require('body-parser')
+const bodyParser = require('body-parser')
 
 const app = express();
-app.use('/', routers())
-app.use(bodyParse.json)
-app.use(bodyParse.urlencoded({extends: true}))
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
+app.use('/api', routers);
 
 // Sincroniza todos los modelos definidos con la base de datos
-sequelize.sync({ force: true })
+sequelize.sync({ force: false })
   .then(() => {
     console.log('Modelos sincronizados con la base de datos.');
   })

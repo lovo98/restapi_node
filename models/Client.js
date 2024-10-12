@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../db/index');
 
-const Usuario = sequelize.define('Usuario', {
+const Client = sequelize.define('Client', {
   // Definir atributos del modelo
   nombre: {
     type: DataTypes.STRING,
@@ -21,12 +21,9 @@ const Usuario = sequelize.define('Usuario', {
     allowNull: false,
   },
   telefono: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING,
     allowNull: false,
   },
-}, {
-  // Opciones del modelo
-  timestamps: true, // Añade createdAt y updatedAt por defecto
 });
 
-module.exports = Usuario;
+module.exports = Client;
