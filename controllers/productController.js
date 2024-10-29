@@ -1,11 +1,46 @@
 const Product = require('../models/Product');
+const multer = require('multer');
+const shortid = require('shortid');
+
+const configuracionMulter = {
+    storage: fileStorage = multer.diskStorage({
+        destination: (req, file, cb) => {
+            cb(null, __dirname+'../../uploads/');
+        },
+        filename:(res, file, cb) => {
+            const extension =file.mimetype.split('/')[1];
+            cb(null, `${shortid.generate()}.${extension}`);
+        }
+    }),
+    fileFilter(req, file, cb) {
+        if (file.mimetype === 'image/jpeg'  || file.mimetype === 'image/png') {
+            cb(null, true);
+        } else {
+            cb(new Error('Formato no valido.'));
+        }
+    }
+}
+
+const upload = multer(configuracionMulter).single('imagen');
+
+exports.uploadFile = (req, res, next) => {
+    upload(req, res, function(error) {
+        if (error) {
+            res.json({mensjae: error})
+        }
+        return next();
+    })
+}
 
 exports.addProduct = async (req, res, next) => {
     try {
-        await Product.create(req.body);
+        const product = await Product.create(req.body);
+        if (req.file && req.file.filename) {
+            await product.update({ imagen: req.file.filename });
+        }
         res.json({mensaje: 'Producto creado con exito.'});
     } catch (error) {
-        res.status(500).json('Ocurrio un error al crear producto.');
+        res.status(500).json({mensaje: 'Ocurrio un error al crear producto.'});
         next();
     }
 }
