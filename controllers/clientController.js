@@ -19,8 +19,9 @@ exports.updateClient = async(req, res, next) => {
         await Client.update(dataUpdate, {where: {id}})
         if (dataUpdate[0] === 0) {
             return res.status(404).json({ mensaje: "El cliente no fue encontrado." });
+          } else {
+            res.json({ mensaje: "Cliente actualizado exitosamente." });
           }
-          res.json({ mensaje: "Cliente actualizado exitosamente." });
     } catch (error) {
         res.status(500).json({mensaje: "Ocurrio un error al editar el cliente."})
         next();
@@ -33,8 +34,9 @@ exports.destroyClient = async(req, res, next) => {
         const userDelete = await Client.destroy({where: {id}});
         if(userDelete[0] === 0) {
             return res.status(404).json({ mensaje: "El cliente no fue encontrado." });
+        } else {
+            res.json({mensaje: "Cliente eliminado exitosamente."})
         }
-        res.json({mensaje: "Cliente eliminado exitosamente."})
     } catch (error) {
         res.status(500).json({mensaje: "Ocurrio un error al eliminar el cliente."})
         next();
@@ -57,8 +59,9 @@ exports.detailsClient = async(req, res, next) => {
         const usuario = await Client.findOne({where: {id}});
         if (!usuario) {
             return res.status(404).json({mensaje: "El cliente no existe."});
+        } else {
+            res.json(usuario);
         }
-        res.json(usuario);
     } catch (error) {
         res.status(500).json({mensaje: "Ocurrio un error al obtener el detalle del cliente."});
         next();
