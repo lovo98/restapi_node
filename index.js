@@ -10,7 +10,7 @@ app.use("/api", routers);
 
 // Sincroniza todos los modelos definidos con la base de datos
 sequelize
-	.sync({ force: true })
+	.sync({ force: false })
 	.then(() => {
 		console.log("Modelos sincronizados con la base de datos.");
 	})

@@ -26,10 +26,7 @@ exports.addOrder = async (req, res, next) => {
 					.status(404)
 					.json({ mensaje: "Uno o más productos no encontrados" });
 			}
-
 			// Asocia los productos a la orden
-			console.log("productosAsociados", productosAsociados);
-
 			await order.addProducts(productosAsociados);
 		}
 
@@ -40,3 +37,101 @@ exports.addOrder = async (req, res, next) => {
 		next();
 	}
 };
+
+exports.listOrders = async(req, res, next) => {
+	try {
+		const orders = await Order.findAll({
+			include: [
+				{
+					model: Client,
+					attributes: ['nombre', 'apellido']
+				},
+				{
+					model: Product,
+					attributes: ['nombre', 'precio'],
+					through: {
+						attributes: []
+					}
+				}
+			]
+		})
+		res.json(orders)
+	} catch (error) {
+		res.status(500).json({mensaje: 'Ocurrio un error al mostar las ordenes'})
+		next();
+	}
+}
+
+exports.detailsOrder = async (req, res, next) => {
+	const { id } = req.params;
+	try {
+		const orderDetails = await Order.findOne({where: {id},
+			include: [
+				{
+					model: Client,
+					attributes: ['nombre', 'apellido']
+				},
+				{
+					model: Product,
+					attributes: ['nombre', 'precio'],
+					through: {attributes: []}
+				}
+			]
+	}
+)
+		if (!orderDetails) {
+			res.status(404).json({mensaje: 'La orden no exite'})
+		} else {
+			res.json(orderDetails);
+		}
+	} catch (error) {
+		res.status(500).json({mensaje: 'Ocurrio un error al obtener detalle de la orden'})
+		next()
+	}
+}
+
+exports.deleteOrder = async (req, res, next) => {
+	const { id } = req.params;
+	try {
+		const order = await Order.destroy({where: {id}});
+		if (!order) {
+			res.status(404).json({mensaje: 'No se encontro la orden'})
+		} else {
+			res.json({mensaje: 'Orden eliminada con exito'})
+		}
+	} catch (error) {
+		res.status(500).json({mensaje: 'Ocurrio un error al eliminar la orden'})
+		next();
+	}
+}
+
+exports.updateOrder = async (req, res, next) => {
+	const { id } = req.params;
+	const { clienteId, productos, ...orderData } = req.body
+	try {
+
+		const cliente = await Client.findByPk(clienteId);
+		if (!cliente) {
+			return res.status(404).json({ mensaje: "Cliente no encontrado" });
+		}
+		
+		const [orderUpdate] = await Order.update(orderData, {where: {id}})
+		if (!orderUpdate) {
+			res.status(400).json({mensaje: 'La orden no existe'})
+		}
+
+		if (clienteId) {
+			await Order.update({clienteId}, {where: {id}})
+		}
+
+		if (productos && productos.length) {
+			const orderP = await Order.findByPk(id);
+			await orderP.setProducts(productos)
+		}
+
+		res.json({mensaje: 'Orden actualizada con exito'})
+	} catch (error) {
+		res.status(500).json({mensaje: 'Ocurrio un error al actualizar la orden'})
+		next();
+	}
+}

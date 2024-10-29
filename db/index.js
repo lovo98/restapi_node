@@ -1,7 +1,7 @@
 const { Sequelize } = require("sequelize");
 
 // Crear una instancia de Sequelize con tus credenciales de base de datos
-const sequelize = new Sequelize("restapi", "klovos", "Lidialeon2023!", {
+const sequelize = new Sequelize("restapi", "root", "", {
 	host: "localhost",
 	dialect: "mysql", // o 'postgres', 'sqlite', etc.
 });
